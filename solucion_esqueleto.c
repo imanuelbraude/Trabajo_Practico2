@@ -176,22 +176,75 @@ char *strConcatenate(char *src1, char *src2) {
 
 GameBoard *gameBoardNew() {
     // TODO: Reservar memoria para el GameBoard.
-
-    // TODO: Usar un bucle para hacer malloc de las 20 filas (RowNode) y
-    // conectarlas.
+    // TODO: Usar un bucle para hacer malloc de las 20 filas (RowNode) y conectarlas.
     // TODO: El puntero first_row debe apuntar al primero de esos nodos.
     // TODO: Inicializar queue_head, queue_tail y first_particle en NULL.
-    printf("Función gameBoardNew no implementada.\n");
-    return NULL;
+    GameBoard* new = (GameBoard*) malloc(sizeof(GameBoard));
+    if (new == NULL){
+        printf("Función gameBoardNew no implementada.\n");
+        return NULL;
+    }
+    new -> first_row = NULL;
+    new -> queue_head = NULL;
+    new -> queue_tail = NULL;
+    new -> first_particle = NULL;
+    new -> score = 0;
+    new -> tick_timer = 0;
+
+    new -> current_piece.col = 0;
+    new -> current_piece.row = 0;
+    new -> current_piece.type = 0;
+    new -> current_piece.rotation = 0;
+    new -> current_piece.active = 0;
+
+    for (int i=20; i>0; i--){
+        RowNode* Fila = (RowNode*) malloc (sizeof(RowNode));
+        if(Fila == NULL){
+            while(new->first_row != NULL){
+                RowNode* sig = new->first_row->next;
+                free(new -> first_row);
+                new -> first_row = sig;
+            }
+            free(new);
+            return NULL;
+        }
+        for(int j=0; j<GRID_COLS; j++){
+            Fila->cells[j] = 0;    
+        }
+        Fila -> next = new->first_row;
+        new -> first_row = Fila;
+    }
+    return new;
 }
 
 void gameBoardDelete(GameBoard *board) {
-    // TODO: Debe tolerar board == NULL.
+// TODO: Debe tolerar board == NULL.
     // TODO: Recorrer y liberar todos los RowNode con free().
     // TODO: Recorrer y liberar todos los PieceQueueNode.
     // TODO: Recorrer y liberar todos los ParticleNode.
     // TODO: Finalmente, liberar la estructura GameBoard.
-    printf("Función gameBoardDelete no implementada.\n");
+    if (board == NULL){
+        printf("Función gameBoardDelete no implementada.\n");
+        return;
+    }
+
+    while(board->first_row != NULL){
+        RowNode* sig = board->first_row->next;
+        free(board -> first_row);
+        board -> first_row = sig;
+    }
+    
+    while(board->queue_head != NULL){
+        PieceQueueNode* sig = board->queue_head-> next;
+        free(board-> queue_head);
+        board -> queue_head = sig;
+    }
+    while(board->first_particle !=NULL){
+        ParticleNode* sig = board->first_particle -> next;
+        free(board-> first_particle);
+        board -> first_particle = sig;
+    }
+    free(board);
 }
 
 void gameBoardAddParticle(GameBoard *board, float x, float y, int color) {
